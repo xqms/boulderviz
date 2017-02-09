@@ -1,10 +1,43 @@
 {% extends 'base.html' %}
 
-{% load i18n widget_tweaks %}
+{% load i18n %}
 
 {% block tab_leaderboard %}active{% endblock %}
 {% block content %}
 
+<h2>{% trans 'Leaderboard' %}</h2>
 
+<ul class="nav nav-tabs">
+	{% for code, label in categories %}
+	<li role="presentation" class="{% if code == category %}active{% endif %}">
+		<a href="{% url 'leaderboard' category=code %}">{{ code }}: {{ label }}</a>
+	</li>
+	{% endfor %}
+</ul>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Climber</th>
+			<th>Points</th>
+			<th>*Points</th>
+			{% for color in colors %}
+			<th>{{ color }}</th>
+			{% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for climber in climbers %}
+		<tr>
+			<td>{{ climber.name }}</td>
+			<td>{{ climber.points }}</td>
+			<td>{{ climber.all_points }}</td>
+			{% for colorcount in climber.listCountsByCategory %}
+			<td>{{ colorcount }}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
 
 {% endblock %}

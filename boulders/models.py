@@ -82,6 +82,10 @@ class Climber(models.Model):
 		query = self.routes.values('color').annotate(models.Count('id')).order_by('color')
 		return { elem['color']: elem['id__count'] for elem in query }
 
+	def listCountsByCategory(self):
+		counts = self.countRoutesByCategory()
+		return [ counts.get(i, 0) for i in range(Route.PINK+1) ]
+
 	def minColor(self):
 		""" Minimum color this climber is interested in """
 		return {
