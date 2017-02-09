@@ -39,7 +39,7 @@ class Command(BaseCommand):
 				if climbed:
 					climb, created = Climb.objects.get_or_create(climber=climber, route=route)
 					if created:
-						self.stdout.write(self.style.SUCCESS('Climber %s has climbed new route %s/%d' % (climber.name, color, route.number)))
+						self.stdout.write(self.style.SUCCESS('Climber %s has climbed new route %s' % (climber.name, str(route))))
 				else:
 					try:
 						climb = Climb.objects.get(climber=climber, route=route)
@@ -47,6 +47,9 @@ class Command(BaseCommand):
 						climb.delete()
 					except Climb.DoesNotExist:
 						pass
+
+		climber.updatePoints()
+		climber.save()
 
 	def update_categories(self, session):
 		leaderboard = session.get('http://climbercontest.de/bbl2017/contest.php')
