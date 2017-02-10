@@ -3,6 +3,49 @@
 {% load i18n %}
 
 {% block tab_leaderboard %}active{% endblock %}
+
+{% block extrahead %}
+<style>
+	.num {
+		text-align: right;
+	}
+	.color {
+		width: 5em;
+	}
+	.color_1 {
+		background-color: #ffe4ba;
+	}
+
+	.color_2 {
+		background-color: #fffbba;
+	}
+
+	.color_3 {
+		background-color: #d9ffd8;
+	}
+
+	.color_4 {
+		background-color: #ffa3a3;
+	}
+
+	.color_5 {
+		background-color: #c4cbff;
+	}
+
+	.color_6 {
+		background-color: #e5e5e5;
+	}
+
+	.color_7 {
+		background-color: #a3a3a3;
+	}
+
+	.color_8 {
+		background-color: #ffbaf9;
+	}
+</style>
+{% endblock %}
+
 {% block content %}
 
 <h2>{% trans 'Leaderboard' %}</h2>
@@ -19,10 +62,10 @@
 	<thead>
 		<tr>
 			<th>Climber</th>
-			<th>Points</th>
-			<th>*Points</th>
+			<th class="num">Points</th>
+			<th class="num">*Points</th>
 			{% for color in colors %}
-			<th>{{ color }}</th>
+			<th class="num color color_{{ forloop.counter }}">{{ color }}</th>
 			{% endfor %}
 		</tr>
 	</thead>
@@ -30,10 +73,10 @@
 		{% for climber in climbers %}
 		<tr>
 			<td>{{ climber.name }}</td>
-			<td>{{ climber.points }}</td>
-			<td>{{ climber.all_points }}</td>
+			<td class="num">{{ climber.points }}</td>
+			<td class="num">{{ climber.all_points }}</td>
 			{% for colorcount in climber.listCountsByCategory %}
-			<td>{{ colorcount }}</td>
+			<td class="num color color_{{ forloop.counter }}">{{ colorcount }}</td>
 			{% endfor %}
 		</tr>
 		{% endfor %}
