@@ -12,36 +12,37 @@
 	.color {
 		width: 5em;
 	}
+
 	.color_1 {
-		background-color: #ffe4ba;
+		background-color: #ffe4ba !important;
 	}
 
 	.color_2 {
-		background-color: #fffbba;
+		background-color: #fffbba !important;
 	}
 
 	.color_3 {
-		background-color: #d9ffd8;
+		background-color: #d9ffd8 !important;
 	}
 
 	.color_4 {
-		background-color: #ffa3a3;
+		background-color: #ffa3a3 !important;
 	}
 
 	.color_5 {
-		background-color: #c4cbff;
+		background-color: #c4cbff !important;
 	}
 
 	.color_6 {
-		background-color: #e5e5e5;
+		background-color: #e5e5e5 !important;
 	}
 
 	.color_7 {
-		background-color: #a3a3a3;
+		background-color: #a3a3a3 !important;
 	}
 
 	.color_8 {
-		background-color: #ffbaf9;
+		background-color: #ffbaf9 !important;
 	}
 </style>
 {% endblock %}
@@ -53,34 +54,38 @@
 <ul class="nav nav-tabs">
 	{% for code, label in categories %}
 	<li role="presentation" class="{% if code == category %}active{% endif %}">
-		<a href="{% url 'leaderboard' category=code %}">{{ code }}: {{ label }}</a>
+		<a href="{% url 'leaderboard' category=code %}">{{ code }}<span class="{% if code != category %}hidden-xs{% endif %}">: {{ label }}</span></a>
 	</li>
 	{% endfor %}
 </ul>
 
-<table class="table">
-	<thead>
-		<tr>
-			<th>Climber</th>
-			<th class="num">Points</th>
-			<th class="num">*Points</th>
-			{% for color in colors %}
-			<th class="num color color_{{ forloop.counter }}">{{ color }}</th>
+<div class="table-responsive">
+	<table class="table">
+		<thead>
+			<tr>
+				<th class="num">#</th>
+				<th>Climber</th>
+				<th class="num">Points</th>
+				<th class="num">*Points</th>
+				{% for color in colors %}
+				<th class="num color color_{{ forloop.counter }}">{{ color }}</th>
+				{% endfor %}
+			</tr>
+		</thead>
+		<tbody>
+			{% for climber in climbers %}
+			<tr class="{% if climber == my_climber %}success{% endif %}">
+				<td class="num">{{ climber.place }}.</td>
+				<td>{{ climber.name }}</td>
+				<td class="num">{{ climber.points }}</td>
+				<td class="num">{{ climber.all_points }}</td>
+				{% for colorcount in climber.listCountsByCategory %}
+				<td class="num color color_{{ forloop.counter }}">{{ colorcount }}</td>
+				{% endfor %}
+			</tr>
 			{% endfor %}
-		</tr>
-	</thead>
-	<tbody>
-		{% for climber in climbers %}
-		<tr>
-			<td>{{ climber.name }}</td>
-			<td class="num">{{ climber.points }}</td>
-			<td class="num">{{ climber.all_points }}</td>
-			{% for colorcount in climber.listCountsByCategory %}
-			<td class="num color color_{{ forloop.counter }}">{{ colorcount }}</td>
-			{% endfor %}
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
+		</tbody>
+	</table>
+</div>
 
 {% endblock %}

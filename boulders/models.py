@@ -78,6 +78,9 @@ class Climber(models.Model):
 	def __str__(self):
 		return self.name
 
+	def __unicode__(self):
+		return self.name
+
 	def countRoutesByCategory(self):
 		query = self.routes.values('color').annotate(models.Count('id')).order_by('color')
 		return { elem['color']: elem['id__count'] for elem in query }
