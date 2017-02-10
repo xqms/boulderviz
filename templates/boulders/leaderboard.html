@@ -51,7 +51,7 @@
 
 <h2>{% trans 'Leaderboard' %}</h2>
 
-<ul class="nav nav-tabs">
+<ul class="nav nav-pills">
 	{% for code, label in categories %}
 	<li role="presentation" class="{% if code == category %}active{% endif %}">
 		<a href="{% url 'leaderboard' category=code %}">{{ code }}<span class="{% if code != category %}hidden-xs{% endif %}">: {{ label }}</span></a>
@@ -59,7 +59,7 @@
 	{% endfor %}
 </ul>
 
-<div class="table-responsive">
+<div class="table-responsive" style="margin-top: 3ex">
 	<table class="table">
 		<thead>
 			<tr>
@@ -76,7 +76,7 @@
 			{% for climber in climbers %}
 			<tr class="{% if climber == my_climber %}success{% endif %}">
 				<td class="num">{{ climber.place }}.</td>
-				<td>{{ climber.name }}</td>
+				<td><a href="{{ climber.get_absolute_url }}">{{ climber.name }}</a></td>
 				<td class="num">{{ climber.points }}</td>
 				<td class="num">{{ climber.all_points }}</td>
 				{% for colorcount in climber.listCountsByCategory %}

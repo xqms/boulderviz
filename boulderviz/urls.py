@@ -16,7 +16,10 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
+from boulders.views import leaderboard
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^boulders/', include('boulders.urls')),
+    url(r'^$', leaderboard),
 ]

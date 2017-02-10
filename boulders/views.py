@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 from models import Climber, Route, Climb
 
@@ -15,8 +16,14 @@ def context_processor(request):
 		'climber_form': ClimberSelectForm(initial={'climber': climber})
 	}
 
-def leaderboard(request, category):
+def leaderboard(request, category=None):
 	''' View current leaderboard '''
+
+	if category is None:
+		category = 'A'
+		if 'climber' in request.session:
+			category = Climber.objects.get(id=request.session['climber']).category
+		return redirect('leaderboard', category=category)
 
 	climbers = Climber.objects.filter(category=category).order_by('-points', '-all_points')
 
@@ -49,4 +56,19 @@ def set_climber(request):
 	else:
 		return HttpResponseRedirect('/')
 
-	return render(request, 'name.html', {'form': form})
+def view_climber(request, climber_id):
+	climber = get_object_or_404(Climber, id=climber_id)
+
+	return render(request, 'boulders/climber.html', {
+		'climber': climber,
+		'climbs': climber.climb_set.order_by('-date', 'route__color', 'route__number'),
+		'routes': climber.routes.order_by('color', 'number'),
+	})
+
+def view_route(request, route_id):
+	route = get_object_or_404(Route, id=route_id)
+
+	return render(request, 'boulders/route.html', {
+		'route': route,
+		'climbs': route.climb_set.order_by('date'),
+	})

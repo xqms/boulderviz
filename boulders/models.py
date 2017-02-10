@@ -51,6 +51,10 @@ class Route(models.Model):
 	def __str__(self):
 		return "%s/%d" % (self.get_color_display(), self.number)
 
+	def get_absolute_url(self):
+		from django.urls import reverse
+		return reverse('view_route', kwargs={'route_id': self.id})
+
 	def points(self):
 		return self.COLOR_POINTS[self.color]
 
@@ -80,6 +84,10 @@ class Climber(models.Model):
 
 	def __unicode__(self):
 		return self.name
+
+	def get_absolute_url(self):
+		from django.urls import reverse
+		return reverse('view_climber', kwargs={'climber_id': self.id})
 
 	def countRoutesByCategory(self):
 		query = self.routes.values('color').annotate(models.Count('id')).order_by('color')

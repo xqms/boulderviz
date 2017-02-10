@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+
+{% block extrahead %}
+<style>
+
+ul.routelist {
+	display: inline;
+	list-style-type: none;
+	margin-left: 0;
+	padding-left: 0;
+}
+
+ul.routelist li {
+	display: inline;
+}
+
+ul.routelist li a {
+	display: inline-block;
+	width: 3em;
+	height: 3ex;
+	text-align: center;
+	border-radius: 5px;
+	margin-top: 0.5ex;
+}
+
+.color_1 {
+	background-color: #ffe4ba !important;
+}
+
+.color_2 {
+	background-color: #fffbba !important;
+}
+
+.color_3 {
+	background-color: #d9ffd8 !important;
+}
+
+.color_4 {
+	background-color: #ffa3a3 !important;
+}
+
+.color_5 {
+	background-color: #c4cbff !important;
+}
+
+.color_6 {
+	background-color: #e5e5e5 !important;
+}
+
+.color_7 {
+	background-color: #a3a3a3 !important;
+}
+
+.color_8 {
+	background-color: #ffbaf9 !important;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h2>{{ climber.name }}</h2>
+
+<ul class="nav nav-pills" role="tablist">
+	<li role="tab" class="active">
+		<a href="#timeline" data-toggle="tab">{% trans 'Timeline' %}</a>
+	</li>
+	<li role="tab">
+		<a href="#all_boulders" data-toggle="tab">{% trans 'All boulders' %}</a>
+	</li>
+</ul>
+
+<div class="tab-content" style="padding-top: 3ex">
+	<div role="tabpanel" class="tab-pane active" id="timeline">
+		{% regroup climbs by date as climb_days %}
+		{% for day in climb_days %}
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">{{ day.grouper }} ({{ day.list|length }})</h3>
+				</div>
+				<div class="panel-body">
+					<ul class="routelist">
+						{% for climb in day.list %}
+						<li class=""><a class="color_{{ climb.route.color|add:1 }}" href="{{ climb.route.get_absolute_url }}">{{ climb.route.number }}</a></li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+
+	<div role="tabpanel" class="tab-pane" id="all_boulders">
+		{% regroup routes by color as color_routes %}
+		{% for color in color_routes %}
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">{{ color.list.0.get_color_display }} ({{ color.list|length }})</h3>
+				</div>
+				<div class="panel-body">
+					<ul class="routelist">
+						{% for route in color.list %}
+						<li class=""><a class="color_{{ route.color|add:1 }}" href="{{ route.get_absolute_url }}">{{ route.number }}</a></li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+</div>
+
+{% endblock %}
+

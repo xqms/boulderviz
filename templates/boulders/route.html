@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+
+{% block extrahead %}
+<style>
+
+ul.routelist {
+	display: inline;
+	list-style-type: none;
+	margin-left: 0;
+	padding-left: 0;
+}
+
+ul.routelist li {
+	display: inline;
+}
+
+ul.routelist li a {
+	display: inline-block;
+	width: 3em;
+	height: 3ex;
+	text-align: center;
+	border-radius: 5px;
+	margin-top: 0.5ex;
+}
+
+.color_1 {
+	background-color: #ffe4ba !important;
+}
+
+.color_2 {
+	background-color: #fffbba !important;
+}
+
+.color_3 {
+	background-color: #d9ffd8 !important;
+}
+
+.color_4 {
+	background-color: #ffa3a3 !important;
+}
+
+.color_5 {
+	background-color: #c4cbff !important;
+}
+
+.color_6 {
+	background-color: #e5e5e5 !important;
+}
+
+.color_7 {
+	background-color: #a3a3a3 !important;
+}
+
+.color_8 {
+	background-color: #ffbaf9 !important;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h2><span class="color_{{ route.color|add:1 }}">{{ route.get_color_display }}</span>: Route {{ route.number }}</h2>
+
+<p>{% trans 'Climbers:' %}</p>
+
+<ol>
+	{% for climb in climbs %}
+	<li><a href="{{ climb.climber.get_absolute_url }}">{{ climb.climber.name }}</a>: {{ climb.date }}</li>
+	{% endfor %}
+</ol>
+
+{% endblock %}
