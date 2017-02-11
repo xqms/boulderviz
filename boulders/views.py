@@ -60,7 +60,11 @@ def set_climber(request):
 
 	form = ClimberSelectForm(request.POST)
 	if form.is_valid():
-		request.session['climber'] = form.cleaned_data['climber'].id
+		climber = form.cleaned_data['climber']
+		if climber:
+			request.session['climber'] = climber.id
+		else:
+			del request.session['climber']
 		return HttpResponseRedirect(request.POST['redirect-to'])
 
 	# if a GET (or any other method) we'll create a blank form
@@ -85,13 +89,16 @@ def view_route(request, route_id):
 	})
 
 def advisor(request):
-	if not request.climber:
-		return HttpResponseBadRequest()
+	colors = [ c[0] for c in Route.COLOR_CHOICES ]
+	if request.climber:
+		colors = request.climber.interestingColors()
 
-	colors = request.climber.interestingColors()
-	routes = Route.objects \
-		.filter(color__in=colors) \
-		.exclude(climbers=request.climber) \
+	routes = Route.objects.filter(color__in=colors)
+
+	if request.climber:
+		routes = routes.exclude(climbers=request.climber)
+
+	routes = routes \
 		.filter(climb__gt=0) \
 		.annotate(Count('climb')) \
 		.order_by('color', '-climb__count', 'number')

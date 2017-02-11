@@ -41,9 +41,7 @@
 			<div id="navbar" class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
 					<li class="{% block tab_leaderboard %}{% endblock %}"><a href="/boulders/leaderboard/">{% trans 'Leaderboard' %}</a></li>
-					{% if my_climber %}
 					<li class="{% block tab_advisor %}{% endblock %}"><a href="{% url 'advisor' %}">{% trans 'Advisor' %}</a></li>
-					{% endif %}
 				</ul>
 				<form class="climberselect_form navbar-form navbar-left" method="POST" action="{% url 'set_climber' %}">
 					{% csrf_token %}

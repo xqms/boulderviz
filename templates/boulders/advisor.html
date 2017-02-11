@@ -67,10 +67,17 @@ ul.routelist li a {
 <h2>{% trans 'Advisor' %}</h2>
 
 <p>
+{% if my_climber %}
 {% blocktrans %}
 Here are all boulders that you haven't climbed yet - ordered by the number of
 climbers who have done them (shown in parentheses).
 {% endblocktrans %}
+{% else %}
+{% blocktrans %}
+Here are all boulders - ordered by the number of climbers who have done them
+(shown in parentheses).
+{% endblocktrans %}
+{% endif %}
 </p>
 
 {% regroup routes by color as colors %}

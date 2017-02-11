@@ -9,4 +9,5 @@ class ClimberSelectForm(forms.Form):
 	climber = forms.ModelChoiceField(
 		queryset=Climber.objects.order_by('name'),
 		empty_label=_('Climber'),
+		required=False,
 	)
