@@ -1,28 +1,39 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.db.models import Count
 
 from models import Climber, Route, Climb
 
 from forms import ClimberSelectForm
 
 def context_processor(request):
-	climber = None
-	if 'climber' in request.session:
-		climber = Climber.objects.get(id=request.session['climber'])
-
 	return {
-		'my_climber': climber,
-		'climber_form': ClimberSelectForm(initial={'climber': climber})
+		'my_climber': request.climber,
+		'climber_form': ClimberSelectForm(initial={'climber': request.climber})
 	}
+
+def middleware(get_response):
+	def m(request):
+		request.climber = None
+		if 'climber' in request.session:
+			try:
+				request.climber = Climber.objects.get(id=request.session['climber'])
+			except Climber.DoesNotExist:
+				del request.session['climber']
+
+		return get_response(request)
+
+	return m
+
 
 def leaderboard(request, category=None):
 	''' View current leaderboard '''
 
 	if category is None:
 		category = 'A'
-		if 'climber' in request.session:
-			category = Climber.objects.get(id=request.session['climber']).category
+		if request.climber:
+			category = request.climber.category
 		return redirect('leaderboard', category=category)
 
 	climbers = Climber.objects.filter(category=category).order_by('-points', '-all_points')
@@ -71,4 +82,20 @@ def view_route(request, route_id):
 	return render(request, 'boulders/route.html', {
 		'route': route,
 		'climbs': route.climb_set.order_by('date'),
+	})
+
+def advisor(request):
+	if not request.climber:
+		return HttpResponseBadRequest()
+
+	colors = request.climber.interestingColors()
+	routes = Route.objects \
+		.filter(color__in=colors) \
+		.exclude(climbers=request.climber) \
+		.filter(climb__gt=0) \
+		.annotate(Count('climb')) \
+		.order_by('color', '-climb__count', 'number')
+
+	return render(request, 'boulders/advisor.html', {
+		'routes': routes
 	})

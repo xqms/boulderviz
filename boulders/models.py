@@ -107,9 +107,11 @@ class Climber(models.Model):
 			'E': Route.GRAY,
 		}[self.category]
 
-	def _points(self):
-		colors = [self.minColor(), self.minColor() + 1, Route.PINK]
+	def interestingColors(self):
+		return [self.minColor(), self.minColor() + 1, Route.PINK]
 
+	def _points(self):
+		colors = self.interestingColors()
 		counts = self.countRoutesByCategory()
 
 		# Filter by interesting colors and annotate with color points

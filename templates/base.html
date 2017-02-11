@@ -58,6 +58,9 @@
 			<div id="navbar" class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
 					<li class="{% block tab_leaderboard %}{% endblock %}"><a href="/boulders/leaderboard/">{% trans 'Leaderboard' %}</a></li>
+					{% if my_climber %}
+					<li class="{% block tab_advisor %}{% endblock %}"><a href="{% url 'advisor' %}">{% trans 'Advisor' %}</a></li>
+					{% endif %}
 				</ul>
 				<form class="climberselect_form navbar-form navbar-left" method="POST" action="{% url 'set_climber' %}">
 					{% csrf_token %}
@@ -66,7 +69,7 @@
 					{% endfor %}
 					<input type="hidden" name="redirect-to" value="{{ request.get_full_path }}" />
 					<div class="form-group">
-						{% render_field climber_form.climber onchange="this.form.submit();" %}
+						<span style="color: white">{% trans 'I am:' %}</span> {% render_field climber_form.climber onchange="this.form.submit();" %}
 					</div>
 					<noscript><input type="submit" value="OK" /></noscript>
 				</form>
