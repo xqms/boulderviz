@@ -108,10 +108,16 @@ class Climber(models.Model):
 		}[self.category]
 
 	def interestingColors(self):
+		""" Colors which contribute to the climbers score """
 		return [self.minColor(), self.minColor() + 1, Route.PINK]
 
-	def _points(self):
-		colors = self.interestingColors()
+	def allInterestingColors(self):
+		""" Colors which contribute to the climbers *score """
+		return range(self.minColor(), Route.PINK+1)
+
+	def _pointsForColors(self, colors):
+		""" Sum up the points this climber gets in the specified colors """
+
 		counts = self.countRoutesByCategory()
 
 		# Filter by interesting colors and annotate with color points
@@ -134,32 +140,12 @@ class Climber(models.Model):
 				break
 
 		return points
+
+	def _points(self):
+		return self._pointsForColors(self.interestingColors())
 
 	def _allPoints(self):
-		colors = range(self.minColor(), Route.PINK+1)
-
-		counts = self.countRoutesByCategory()
-
-		# Filter by interesting colors and annotate with color points
-		counts = [ (Route.COLOR_POINTS[color], count)
-			for color, count in counts.items() if color in colors ]
-
-		# Sort descending by points
-		counts.sort(key=lambda x: x[0], reverse=True)
-
-		# Take best 150!
-		remaining = 150
-		points = 0
-
-		for color, count in counts:
-			use = min(remaining, count)
-			points += use * Route.COLOR_POINTS[color]
-			remaining -= use
-
-			if remaining == 0:
-				break
-
-		return points
+		return self._pointsForColors(self.allInterestingColors())
 
 	def updatePoints(self):
 		self.points = self._points()
