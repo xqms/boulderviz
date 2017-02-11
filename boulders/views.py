@@ -91,7 +91,7 @@ def view_route(request, route_id):
 def advisor(request):
 	colors = [ c[0] for c in Route.COLOR_CHOICES ]
 	if request.climber:
-		colors = request.climber.interestingColors()
+		colors = request.climber.allInterestingColors()
 
 	routes = Route.objects.filter(color__in=colors)
 
