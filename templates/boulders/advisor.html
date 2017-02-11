@@ -75,7 +75,7 @@ ul.routelist li a {
 	<div class="panel-body">
 		<ul class="routelist">
 			{% for route in color.list %}
-			<li class=""><a class="color_{{ route.color|add:1 }}" href="{{ climb.route.get_absolute_url }}">{{ route.number }} ({{ route.climb__count }})</a></li>
+			<li class=""><a class="color_{{ route.color|add:1 }}" href="{{ route.get_absolute_url }}">{{ route.number }} ({{ route.climb__count }})</a></li>
 			{% endfor %}
 		</ul>
 	</div>
