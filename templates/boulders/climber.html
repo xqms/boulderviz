@@ -64,6 +64,13 @@ ul.routelist li a {
 
 <h2>{{ climber.name }}</h2>
 
+{% url 'leaderboard' category=climber.category as category_url %}
+<p>
+{% blocktrans with name=climber.name category=climber.category category_url=category_url gender=climber.get_gender_display|lower %}
+{{ name }} climbs in <a href="{{ category_url }}">category {{ category }}</a> and is {{ gender }}.
+{% endblocktrans %}
+</p>
+
 <ul class="nav nav-pills" role="tablist">
 	<li role="tab" class="active">
 		<a href="#timeline" data-toggle="tab">{% trans 'Timeline' %}</a>
