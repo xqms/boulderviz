@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from datetime import date
+from datetime import date, datetime, timedelta
 
 class Route(models.Model):
 	class Meta:
@@ -71,6 +71,14 @@ class Climber(models.Model):
 		('f', 'Female'),
 	)
 
+	MIN_COLOR_FOR_CATEGORY = {
+		'A': Route.ORANGE,
+		'B': Route.GREEN,
+		'C': Route.RED,
+		'D': Route.BLUE,
+		'E': Route.GRAY,
+	}
+
 	name = models.CharField(max_length=255, verbose_name=_('Name'))
 	category = models.CharField(max_length=1, choices=CATEGORY_CHOICES)
 	gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
@@ -97,15 +105,13 @@ class Climber(models.Model):
 		counts = self.countRoutesByCategory()
 		return [ counts.get(i, 0) for i in range(Route.PINK+1) ]
 
+	def listCountsByAllInterestingCategories(self):
+		counts = self.countRoutesByCategory()
+		return [ (i, counts.get(i, 0)) for i in self.allInterestingColors() ]
+
 	def minColor(self):
 		""" Minimum color this climber is interested in """
-		return {
-			'A': Route.ORANGE,
-			'B': Route.GREEN,
-			'C': Route.RED,
-			'D': Route.BLUE,
-			'E': Route.GRAY,
-		}[self.category]
+		return self.MIN_COLOR_FOR_CATEGORY[self.category]
 
 	def interestingColors(self):
 		""" Colors which contribute to the climbers score """
@@ -151,10 +157,14 @@ class Climber(models.Model):
 		self.points = self._points()
 		self.all_points = self._allPoints()
 
+def climbdate():
+	""" Return most likely day of climbing, if the climber entered the data now """
+	return (datetime.now() - timedelta(hours=9)).date()
+
 class Climb(models.Model):
 	climber = models.ForeignKey(Climber, on_delete=models.CASCADE)
 	route = models.ForeignKey(Route, on_delete=models.CASCADE)
-	date = models.DateField(default=date.today)
+	date = models.DateField(default=climbdate)
 
 	def __str__(self):
 		return "{}: {}".format(self.climber, str(self.route))
