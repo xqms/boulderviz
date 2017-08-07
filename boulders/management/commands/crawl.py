@@ -81,7 +81,7 @@ class Command(BaseCommand):
 
 				climbers = Climber.objects.filter(name=name)
 				if len(climbers) > 1:
-					self.stderr.write(self.style.WARNING('Multiple climbers with name "%s"' % name))
+					self.stdout.write(self.style.WARNING('Multiple climbers with name "%s"' % name))
 				climbers.update(category=category, gender=gender)
 
 	@transaction.atomic

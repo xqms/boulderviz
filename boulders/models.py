@@ -177,7 +177,7 @@ class Climber(models.Model):
 
 def climbdate():
 	""" Return most likely day of climbing, if the climber entered the data now """
-	return (datetime.now() - timedelta(hours=9)).date()
+	return (datetime.now() - timedelta(hours=11)).date()
 
 class Climb(models.Model):
 	climber = models.ForeignKey(Climber, on_delete=models.CASCADE)
