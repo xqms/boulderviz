@@ -52,6 +52,10 @@ class Route(models.Model):
 	def color_for_idx(self, idx):
 		return self.COLOR_CHOICES[idx][0]
 
+	@classmethod
+	def colorName(self, id):
+		return [ name for cid, name in self.COLOR_CHOICES if cid == id ][0]
+
 	def __str__(self):
 		return "%s/%d" % (self.get_color_display(), self.number)
 
@@ -123,9 +127,17 @@ class Climber(models.Model):
 		""" Colors which contribute to the climbers score """
 		return [self.minColor(), self.minColor() + 1, Route.PINK]
 
+	def interestingColorsWithNames(self):
+		""" Colors which contribute to the climbers score """
+		return [ (color, Route.colorName(color)) for color in self.interestingColors() ]
+
 	def allInterestingColors(self):
 		""" Colors which contribute to the climbers *score """
 		return range(self.minColor(), Route.PINK+1)
+
+	def allInterestingColorsWithNames(self):
+		""" Colors which contribute to the climbers score """
+		return [ (color, Route.colorName(color)) for color in self.allInterestingColors() ]
 
 	def _pointsForColors(self, colors):
 		""" Sum up the points this climber gets in the specified colors """

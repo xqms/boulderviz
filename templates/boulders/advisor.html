@@ -6,95 +6,147 @@
 
 {% block extrahead %}
 <style>
+	@media (max-width: 768px) {
+		.container {
+			padding:0;
+			margin:0;
+		}
+	}
 
-ul.routelist {
-	display: inline;
-	list-style-type: none;
-	margin-left: 0;
-	padding-left: 0;
-}
+	.num {
+		text-align: right;
+	}
+	.color {
+		width: 5em;
+	}
 
-ul.routelist li {
-	display: inline;
-}
+	.color_1 {
+		background-color: #ffe4ba !important;
+	}
 
-ul.routelist li a {
-	display: inline-block;
-	width: 5em;
-	height: 3ex;
-	text-align: center;
-	border-radius: 5px;
-	margin-top: 0.5ex;
-}
+	.color_2 {
+		background-color: #fffbba !important;
+	}
 
-.color_1 {
-	background-color: #ffe4ba !important;
-}
+	.color_3 {
+		background-color: #d9ffd8 !important;
+	}
 
-.color_2 {
-	background-color: #fffbba !important;
-}
+	.color_4 {
+		background-color: #ffa3a3 !important;
+	}
 
-.color_3 {
-	background-color: #d9ffd8 !important;
-}
+	.color_5 {
+		background-color: #c4cbff !important;
+	}
 
-.color_4 {
-	background-color: #ffa3a3 !important;
-}
+	.color_6 {
+		background-color: #e5e5e5 !important;
+	}
 
-.color_5 {
-	background-color: #c4cbff !important;
-}
+	.color_7 {
+		background-color: #a3a3a3 !important;
+	}
 
-.color_6 {
-	background-color: #e5e5e5 !important;
-}
-
-.color_7 {
-	background-color: #a3a3a3 !important;
-}
-
-.color_8 {
-	background-color: #ffbaf9 !important;
-}
-
+	.color_8 {
+		background-color: #ffbaf9 !important;
+	}
 </style>
 {% endblock %}
 
 {% block content %}
 
+{% if not my_climber %}
 <h2>{% trans 'Advisor' %}</h2>
 
-<p>
-{% if my_climber %}
-{% blocktrans %}
-Here are all boulders that you haven't climbed yet - ordered by the number of
-climbers who have done them (shown in parentheses).
-{% endblocktrans %}
+<div class="table-responsive" style="margin-top: 3ex">
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Color</th>
+				<th class="num">Route</th>
+				<th class="num">ELO</th>
+				<th class="num">#Climbs</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for route in routes %}
+			<tr class="color_{{ route.color|add:1 }}">
+				<td>{{ route.get_color_display }}</td>
+				<td class="num"><a href="{{ route.get_absolute_url }}">{{ route.number }}</a></td>
+				<td class="num">{{ route.elo|floatformat:0 }}</td>
+				<td class="num">{{ route.climb__count }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
 {% else %}
-{% blocktrans %}
-Here are all boulders - ordered by the number of climbers who have done them
-(shown in parentheses).
-{% endblocktrans %}
-{% endif %}
+
+<h2>{% trans 'Advisor for' %} {{ my_climber.name }}</h2>
+
+<p>
+Shown colors:
+{% for color, name in my_climber.allInterestingColorsWithNames %}
+<a class="btn btn-default active" data-toggle="button" href="#" role="button" onclick="$('.color_{{color|add:1}}').toggle();">{{ name }}</a>
+{% endfor %}
 </p>
 
-{% regroup routes by color as colors %}
-{% for color in colors %}
+<div class="col-sm-6">
 <div class="panel panel-default">
-	<div class="panel-heading">
-		<h3 class="panel-title">{{ color.list.0.get_color_display }} ({{ color.list|length }})</h3>
-	</div>
-	<div class="panel-body">
-		<ul class="routelist">
-			{% for route in color.list %}
-			<li class=""><a class="color_{{ route.color|add:1 }}" href="{{ route.get_absolute_url }}">{{ route.number }} ({{ route.climb__count }})</a></li>
+	<div class="panel-heading">Routes below {{ my_climber.elo|floatformat:0 }} ELO</div>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Color</th>
+				<th class="num">Route</th>
+				<th class="num">ELO</th>
+				<th class="num">#Climbs</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for route in routes_below %}
+			<tr class="color_{{ route.color|add:1 }}">
+				<td>{{ route.get_color_display }}</td>
+				<td class="num"><a href="{{ route.get_absolute_url }}">{{ route.number }}</a></td>
+				<td class="num">{{ route.elo|floatformat:0 }}</td>
+				<td class="num">{{ route.climb__count }}</td>
+			</tr>
 			{% endfor %}
-		</ul>
-	</div>
+		</tbody>
+	</table>
 </div>
-{% endfor %}
+</div>
+
+<div class="col-sm-6">
+<div class="panel panel-default">
+	<div class="panel-heading">Routes above {{ my_climber.elo|floatformat:0 }} ELO</div>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Color</th>
+				<th class="num">Route</th>
+				<th class="num">ELO</th>
+				<th class="num">#Climbs</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for route in routes_above %}
+			<tr class="color_{{ route.color|add:1 }}">
+				<td>{{ route.get_color_display }}</td>
+				<td class="num"><a href="{{ route.get_absolute_url }}">{{ route.number }}</a></td>
+				<td class="num">{{ route.elo|floatformat:0 }}</td>
+				<td class="num">{{ route.climb__count }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+</div>
+
+{% endif %}
 
 {% endblock %}
 

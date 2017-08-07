@@ -7,6 +7,9 @@ from models import Climber, Route, Climb
 
 from forms import ClimberSelectForm
 
+import django.utils.timezone
+import datetime
+
 def context_processor(request):
 	return {
 		'my_climber': request.climber,
@@ -94,16 +97,27 @@ def advisor(request):
 	if request.climber:
 		colors = request.climber.allInterestingColors()
 
-	routes = Route.objects.filter(color__in=colors)
+	start_date = django.utils.timezone.now() - datetime.timedelta(20)
+
+	routes = Route.objects.filter(color__in=colors, climb__date__gte=start_date.date())
 
 	if request.climber:
 		routes = routes.exclude(climbers=request.climber)
 
 	routes = routes \
 		.filter(climb__gt=0) \
-		.annotate(Count('climb')) \
-		.order_by('color', '-climb__count', 'number')
+		.annotate(Count('climb', distinct=True)) \
+		.order_by('elo', 'number')
+
+	routes_above = None
+	routes_below = None
+
+	if request.climber:
+		routes_above = routes.filter(elo__gt=request.climber.elo)
+		routes_below = routes.filter(elo__lte=request.climber.elo)
 
 	return render(request, 'boulders/advisor.html', {
-		'routes': routes
+		'routes': routes,
+		'routes_above': routes_above,
+		'routes_below': routes_below,
 	})
