@@ -109,10 +109,24 @@ ul.routelist li a {
 		var trace = {
 			x: [ {% for snapshot in climber.climbersnapshot_set.all %} '{{ snapshot.date|date:"Y-m-d H:i" }}' {% if not forloop.last %},{% endif %} {% endfor %} ],
 			y: [ {% for snapshot in climber.climbersnapshot_set.all %} {{ snapshot.elo }} {% if not forloop.last %},{% endif %} {% endfor %} ],
-			type: 'scatter'
+			type: 'scatter',
+			name: '{{ climber.name }}'
 		};
 
-		Plotly.newPlot('elo_history', [trace]);
+		var traces = [trace];
+
+		{% if my_climber and my_climber != climber %}
+		var my_trace = {
+			x: [ {% for snapshot in my_climber.climbersnapshot_set.all %} '{{ snapshot.date|date:"Y-m-d H:i" }}' {% if not forloop.last %},{% endif %} {% endfor %} ],
+			y: [ {% for snapshot in my_climber.climbersnapshot_set.all %} {{ snapshot.elo }} {% if not forloop.last %},{% endif %} {% endfor %} ],
+			type: 'scatter',
+			name: '{{ my_climber.name }}'
+		};
+
+		traces.push(my_trace);
+		{% endif %}
+
+		Plotly.newPlot('elo_history', traces);
 		</script>
 	</div>
 </div>

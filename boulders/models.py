@@ -5,6 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from datetime import date, datetime, timedelta
 
+import django.utils.timezone
+
 class Route(models.Model):
 	class Meta:
 		index_together = ['color', 'number']
@@ -174,13 +176,19 @@ class Climb(models.Model):
 		return "{}: {}".format(self.climber, str(self.route))
 
 class ClimberSnapshot(models.Model):
+	class Meta:
+		ordering = ['date']
+
 	climber = models.ForeignKey(Climber, on_delete=models.CASCADE)
-	date = models.DateTimeField(auto_now_add=True)
+	date = models.DateTimeField(default=django.utils.timezone.now)
 
 	elo = models.FloatField()
 
 class RouteSnapshot(models.Model):
+	class Meta:
+		ordering = ['date']
+
 	route = models.ForeignKey(Route, on_delete=models.CASCADE)
-	date = models.DateTimeField(auto_now_add=True)
+	date = models.DateTimeField(default=django.utils.timezone.now)
 
 	elo = models.FloatField()
