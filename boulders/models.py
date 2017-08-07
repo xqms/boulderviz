@@ -168,3 +168,9 @@ class Climb(models.Model):
 
 	def __str__(self):
 		return "{}: {}".format(self.climber, str(self.route))
+
+class ClimberSnapshot(models.Model):
+	climber = models.ForeignKey(Climber, on_delete=models.CASCADE)
+	date = models.DateTimeField(default=datetime.now)
+
+	elo = models.FloatField()
