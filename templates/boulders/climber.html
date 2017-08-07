@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load i18n %}
+{% load staticfiles %}
 
 {% block extrahead %}
 <style>
@@ -58,6 +59,7 @@ ul.routelist li a {
 }
 
 </style>
+<script type="text/javascript" src="{% static 'plotly/plotly.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -70,6 +72,50 @@ ul.routelist li a {
 {{ name }} climbs in <a href="{{ category_url }}">category {{ category }}</a> and is {{ gender }}.
 {% endblocktrans %}
 </p>
+
+<div class="table-responsive" style="margin-top: 3ex">
+	<table class="table">
+		<thead>
+			<tr>
+				<th class="num">Points</th>
+				<th class="num">*Points</th>
+				<th class="num">ELO</th>
+				{% for color in colors %}
+				<th class="num color color_{{ forloop.counter }}">{{ color }}</th>
+				{% endfor %}
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="num">{{ climber.points }}</td>
+				<td class="num">{{ climber.all_points }}</td>
+				<td class="num">{{ climber.elo|floatformat:1 }} </td>
+				{% for colorcount in climber.listCountsByCategory %}
+				<td class="num color color_{{ forloop.counter }}">{{ colorcount }}</td>
+				{% endfor %}
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">ELO history</h3>
+	</div>
+	<div class="panel-body">
+		<div id="elo_history">
+		</div>
+		<script>
+		var trace = {
+			x: [ {% for snapshot in climber.climbersnapshot_set.all %} '{{ snapshot.date|date:"Y-m-d H:i" }}' {% if not forloop.last %},{% endif %} {% endfor %} ],
+			y: [ {% for snapshot in climber.climbersnapshot_set.all %} {{ snapshot.elo }} {% if not forloop.last %},{% endif %} {% endfor %} ],
+			type: 'scatter'
+		};
+
+		Plotly.newPlot('elo_history', [trace]);
+		</script>
+	</div>
+</div>
 
 <ul class="nav nav-pills" role="tablist">
 	<li role="tab" class="active">

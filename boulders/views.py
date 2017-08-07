@@ -78,6 +78,7 @@ def view_climber(request, climber_id):
 		'climber': climber,
 		'climbs': climber.climb_set.order_by('-date', 'route__color', 'route__number'),
 		'routes': climber.routes.order_by('color', 'number'),
+		'colors': [ c[1] for c in Route.COLOR_CHOICES ],
 	})
 
 def view_route(request, route_id):

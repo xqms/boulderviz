@@ -74,6 +74,7 @@
 				<th>Climber</th>
 				<th class="num">Points</th>
 				<th class="num">*Points</th>
+				<th class="num">ELO</th>
 				{% for color in colors %}
 				<th class="num color color_{{ forloop.counter }}">{{ color }}</th>
 				{% endfor %}
@@ -86,6 +87,7 @@
 				<td><a href="{{ climber.get_absolute_url }}">{{ climber.name }}</a></td>
 				<td class="num">{{ climber.points }}</td>
 				<td class="num">{{ climber.all_points }}</td>
+				<td class="num">{{ climber.elo|floatformat:1 }} </td>
 				{% for colorcount in climber.listCountsByCategory %}
 				<td class="num color color_{{ forloop.counter }}">{{ colorcount }}</td>
 				{% endfor %}
