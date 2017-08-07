@@ -44,6 +44,8 @@ class Route(models.Model):
 	color = models.PositiveSmallIntegerField(choices=COLOR_CHOICES)
 	number = models.PositiveSmallIntegerField()
 
+	elo = models.FloatField(default=0)
+
 	@classmethod
 	def color_for_idx(self, idx):
 		return self.COLOR_CHOICES[idx][0]
@@ -86,6 +88,8 @@ class Climber(models.Model):
 
 	points = models.PositiveSmallIntegerField(default=0)
 	all_points = models.PositiveSmallIntegerField(default=0)
+
+	elo = models.FloatField(default=0)
 
 	def __str__(self):
 		return self.name
@@ -171,6 +175,12 @@ class Climb(models.Model):
 
 class ClimberSnapshot(models.Model):
 	climber = models.ForeignKey(Climber, on_delete=models.CASCADE)
-	date = models.DateTimeField(default=datetime.now)
+	date = models.DateTimeField(auto_now_add=True)
+
+	elo = models.FloatField()
+
+class RouteSnapshot(models.Model):
+	route = models.ForeignKey(Route, on_delete=models.CASCADE)
+	date = models.DateTimeField(auto_now_add=True)
 
 	elo = models.FloatField()
