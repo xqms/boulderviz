@@ -127,7 +127,7 @@ def advisor(request):
 		boxes = []
 
 		for color, name in climber.allInterestingColorsWithNames():
-			max_num = Climb.objects.filter(route__color=color).aggregate(Max('route__number'))['route__number__max']
+			max_num = Route.objects.filter(color=color).annotate(Count('climb')).filter(climb__count__gte=2).aggregate(Max('number'))['number__max']
 			max_num += 10
 
 			max_num = int(math.ceil(max_num / float(columns)) * columns)
