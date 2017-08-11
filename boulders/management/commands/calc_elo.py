@@ -107,7 +107,7 @@ class Command(BaseCommand):
 	def handle(self, *args, **options):
 
 		date = None
-		if 'date' in options:
+		if 'date' in options and options['date']:
 			date = options['date']
 			print(date)
 			date = django.utils.timezone.make_aware(datetime.datetime.combine(date, datetime.time(12, 0, 0)))
