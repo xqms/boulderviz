@@ -51,6 +51,38 @@
 	.color_8 {
 		background-color: #ffbaf9 !important;
 	}
+
+	.checktable td {
+		border: 1px solid black;
+		padding: 6px;
+		width: 4ex;
+		text-align: center;
+		font-weight: bold;
+	}
+
+	.checktable td.climbed {
+		text-decoration: line-through;
+		background-color: #a0a0a0;
+		font-weight: normal;
+	}
+
+	.checktable td.never_climbed {
+		font-weight: normal;
+	}
+
+	@media print {
+		body {
+			padding-top: 0;
+		}
+
+		a[href]:after {
+			content: none;
+		}
+
+		.checktable td {
+			font-size: 90%;
+		}
+	}
 </style>
 {% endblock %}
 
@@ -83,20 +115,49 @@
 </div>
 {% else %}
 
-<h2>{% trans 'Advisor for' %} {{ my_climber.name }}</h2>
+<h2>
+{% blocktrans with name=my_climber.name elo=my_climber.elo|floatformat:0 %}
+Advisor for {{ name }} - ELO {{ elo }}
+{% endblocktrans %}
+</h2>
 
-<p>
+<p class="hidden-print">
 Shown colors:
 {% for color, name in my_climber.allInterestingColorsWithNames %}
 <a class="btn btn-default active" data-toggle="button" href="#" role="button" onclick="$('.color_{{color|add:1}}').toggle();">{{ name }}</a>
 {% endfor %}
 </p>
 
+<div class="panel panel-default">
+	<div class="panel-heading">Climbed routes</div>
+
+	<div class="panel-body">
+		<div class="row">
+			{% for color_name, coldata in boxes %}
+			<div class="col-sm-6">
+				<h4>{{ color_name }} routes</h4>
+				<table class="checktable">
+					{% for row in coldata %}
+					<tr>
+						{% for number, climbed, all_climbed in row %}
+						<td class="{% if climbed %}climbed{% endif %} {% if not all_climbed %}never_climbed{% endif %}">{{ number }}</td>
+						{% endfor %}
+					</tr>
+					{% endfor %}
+				</table>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
+<div class="row">
+
 <div class="col-sm-6">
 <div class="panel panel-default">
 	<div class="panel-heading">Routes below {{ my_climber.elo|floatformat:0 }} ELO</div>
 
-	<table class="table">
+	<table class="table table-condensed">
 		<thead>
 			<tr>
 				<th>Color</th>
@@ -123,7 +184,7 @@ Shown colors:
 <div class="panel panel-default">
 	<div class="panel-heading">Routes above {{ my_climber.elo|floatformat:0 }} ELO</div>
 
-	<table class="table">
+	<table class="table table-condensed">
 		<thead>
 			<tr>
 				<th>Color</th>
@@ -144,6 +205,8 @@ Shown colors:
 		</tbody>
 	</table>
 </div>
+</div>
+
 </div>
 
 {% endif %}

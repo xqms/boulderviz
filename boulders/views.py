@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from django.db.models import Count
+from django.db.models import Count, Max
 
 from models import Climber, Route, Climb
 
@@ -9,6 +9,7 @@ from forms import ClimberSelectForm
 
 import django.utils.timezone
 import datetime
+import math
 
 def context_processor(request):
 	return {
@@ -112,12 +113,47 @@ def advisor(request):
 	routes_above = None
 	routes_below = None
 
+	boxes = None
+
+	columns = 10
+	rows = 4
+
 	if request.climber:
+		climber = request.climber
+
 		routes_above = routes.filter(elo__gt=request.climber.elo)
 		routes_below = routes.filter(elo__lte=request.climber.elo)
+
+		boxes = []
+
+		for color, name in climber.allInterestingColorsWithNames():
+			max_num = Climb.objects.filter(route__color=color).aggregate(Max('route__number'))['route__number__max']
+			max_num += 10
+
+			max_num = int(math.ceil(max_num / float(columns)) * columns)
+			min_num = max(1, max_num - rows * columns + 1)
+
+			coldata = [
+				[ [min_num + num, False, False] for num in range(r * columns, r * columns + columns) ]
+				for r in range(0, (max_num - min_num + 1) / columns)
+			]
+
+			climbs = climber.climb_set.filter(route__color=color, route__number__gte=min_num, route__number__lt=max_num)
+			for climb in climbs:
+				idx = climb.route.number - min_num
+				coldata[idx / columns][idx % columns][1] = True
+
+			climbs = Climb.objects.filter(route__color=color, route__number__gte=min_num, route__number__lt=max_num)
+			for climb in climbs:
+				idx = climb.route.number - min_num
+				coldata[idx / columns][idx % columns][2] = True
+
+			boxes.append((name, coldata))
 
 	return render(request, 'boulders/advisor.html', {
 		'routes': routes,
 		'routes_above': routes_above,
 		'routes_below': routes_below,
+		'boxes': boxes,
+		'box_columns': columns,
 	})
