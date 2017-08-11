@@ -123,6 +123,10 @@ class Climber(models.Model):
 		""" Minimum color this climber is interested in """
 		return self.MIN_COLOR_FOR_CATEGORY[self.category]
 
+	def maxColor(self):
+		""" Maximum color this climber is interested in (excluding pink) """
+		return self.minColor() + 1
+
 	def interestingColors(self):
 		""" Colors which contribute to the climbers score """
 		return [self.minColor(), self.minColor() + 1, Route.PINK]

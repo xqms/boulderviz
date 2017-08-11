@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from django.db.models import Max, Count
+from django.db.models import Min, Max, Count
 from boulders.models import Climb, Climber, Route, ClimberSnapshot, RouteSnapshot
 
 import django.utils.timezone
@@ -53,6 +53,9 @@ class Command(BaseCommand):
 		matches = []
 
 		for climber in climbers:
+			# Aggregate minimum and maximum route numbers for each color that
+			# this climber has climbed
+			min_for_color = {}
 			max_for_color = {}
 
 			for color in Route.COLOR_POINTS.keys():
@@ -60,12 +63,21 @@ class Command(BaseCommand):
 				if date:
 					climbs = climbs.filter(date__lte=date.date())
 
-				res = climbs.aggregate(Max('route__number'))
+				if not climbs.exists():
+					continue
+
+				res = climbs.aggregate(Max('route__number'), Min('route__number'))
+				min_for_color[color] = res['route__number__min']
 				max_for_color[color] = res['route__number__max']
 
 			for route in routes:
-				if route.color in max_for_color and route.number > max_for_color[route.color]:
-					continue
+				# If the route is in the climbers category or below, assume that the climber has only tried
+				# the routes up to his maximum entry in that color.
+				# Otherwise, assume that the climber has failed.
+				above_category = route.color != Route.PINK and route.color > climber.maxColor()
+
+				if (not above_category) and ((route.color not in max_for_color) or (route.number > max_for_color[route.color] or route.number < min_for_color[route.color])):
+					continue # No match, climber has probably not tried this one yet.
 
 				climbs = Climb.objects.filter(climber=climber, route=route)
 				if date:
@@ -125,6 +137,9 @@ class Command(BaseCommand):
 		blue_routes = [ route.id for route in routes if route.color == Route.BLUE ]
 
 		for iteration in range(MAX_ITERATIONS):
+			if iteration % 10 == 0:
+				self.stdout.write(self.style.NOTICE('Iteration %d' % iteration))
+
 			kconst = MIN_KCONST + (MAX_KCONST - MIN_KCONST) * math.exp(-iteration / KCONST_DECAY)
 
 			random.shuffle(matches)
@@ -132,7 +147,7 @@ class Command(BaseCommand):
 			for climber, route, climbed in matches:
 				ec = 1.0 / (1.0 + 10.0 ** ((route_elo[route.id] - climber_elo[climber.id]) / 400.0))
 				if climbed:
-					adjustc = kconst * (1 - ec)
+					adjustc = kconst * (1 - ec) # route elo adjustc: kconst * (0 - rec) = kconst * (0 - (1 - cec)) = kconst * (cec - 1)
 				else:
 					adjustc = kconst * (0 - ec)
 
