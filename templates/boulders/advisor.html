@@ -62,6 +62,7 @@
 		width: 5ex;
 		text-align: center;
 		font-weight: bold;
+		font-size: 70%;
 	}
 
 	.checktable td.climbed {
@@ -72,6 +73,12 @@
 
 	.checktable td.never_climbed {
 		font-weight: normal;
+	}
+
+	@media(min-width:992px) {
+		.checktable td {
+			font-size: 100%;
+		}
 	}
 
 	@media print {
@@ -223,6 +230,7 @@ Shown colors:
 	</div>
 </div>
 
+<div class="container-fluid">
 <div class="row">
 
 <div class="col-sm-6">
@@ -279,6 +287,7 @@ Shown colors:
 </div>
 </div>
 
+</div>
 </div>
 
 {% endif %}
