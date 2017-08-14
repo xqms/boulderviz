@@ -30,6 +30,7 @@ class Command(BaseCommand):
 
 	def add_arguments(self, parser):
 		parser.add_argument('--date', type=valid_date, help='Only consider climbs before this date')
+		parser.add_argument('--reset', action='store_true', default=False, help='Reset all ELO history')
 
 	@transaction.atomic
 	def fetchData(self, date):
@@ -52,6 +53,8 @@ class Command(BaseCommand):
 
 		matches = []
 
+		route_climbed = [ False for route in routes ]
+
 		for climber in climbers:
 			# Aggregate minimum and maximum route numbers for each color that
 			# this climber has climbed
@@ -70,7 +73,7 @@ class Command(BaseCommand):
 				min_for_color[color] = res['route__number__min']
 				max_for_color[color] = res['route__number__max']
 
-			for route in routes:
+			for route_idx,route in enumerate(routes):
 				# Anything below your category does not count.
 				if route.color < climber.minColor():
 					continue
@@ -95,6 +98,13 @@ class Command(BaseCommand):
 
 				climbed = route.color < climber.minColor() or climbs.exists()
 				matches.append((climber, route, climbed))
+
+				if climbed:
+					route_climbed[route_idx] = True
+
+		# Filter out routes which still did not get climbs
+		# Can happen if climbs are rejected by the logic above.
+		routes = [ route for idx,route in enumerate(routes) if route_climbed[idx] ]
 
 		return climbers, routes, matches
 
@@ -127,6 +137,13 @@ class Command(BaseCommand):
 				snapshot.save()
 
 	def handle(self, *args, **options):
+
+		if options['reset']:
+			self.stdout.write(self.style.WARNING('Resetting ELO data...'))
+			Route.objects.all().update(elo=0)
+			Climber.objects.all().update(elo=0)
+			RouteSnapshot.objects.all().delete()
+			ClimberSnapshot.objects.all().delete()
 
 		date = None
 		if 'date' in options and options['date']:
