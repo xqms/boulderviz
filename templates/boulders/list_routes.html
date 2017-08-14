@@ -1,0 +1,91 @@
+
+{% extends 'base.html' %}
+
+{% load i18n %}
+
+{% block tab_routes %}active{% endblock %}
+
+{% block extrahead %}
+<style>
+	@media (max-width: 768px) {
+		.container {
+			padding:0;
+			margin:0;
+		}
+	}
+
+	.num {
+		text-align: right;
+	}
+	.color {
+		width: 5em;
+	}
+
+	.color_1 {
+		background-color: #ffe4ba !important;
+	}
+
+	.color_2 {
+		background-color: #fffbba !important;
+	}
+
+	.color_3 {
+		background-color: #d9ffd8 !important;
+	}
+
+	.color_4 {
+		background-color: #ffa3a3 !important;
+	}
+
+	.color_5 {
+		background-color: #c4cbff !important;
+	}
+
+	.color_6 {
+		background-color: #e5e5e5 !important;
+	}
+
+	.color_7 {
+		background-color: #a3a3a3 !important;
+	}
+
+	.color_8 {
+		background-color: #ffbaf9 !important;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h2>{% trans 'Boulders' %}</h2>
+
+<ul class="nav nav-pills">
+	{% for code, label in colors %}
+	<li role="presentation" class="{% if code == color %}active{% endif %}">
+		<a href="{% url 'list_routes' color=code %}">{{ label }}</a>
+	</li>
+	{% endfor %}
+</ul>
+
+<div class="table-responsive" style="margin-top: 3ex">
+	<table class="table">
+		<thead>
+			<tr>
+				<th class="num">Number</th>
+				<th class="num">Climbs</th>
+				<th class="num">ELO</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for route in routes %}
+			<tr class="{% if route.climbed_by_me %}success{% endif %}">
+				<td class="num"><a href="{{ route.get_absolute_url }}">{{ route.number }}</a></td>
+				<td class="num">{{ route.climb__count }}</td>
+				<td class="num">{{ route.elo|floatformat:0 }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+{% endblock %}

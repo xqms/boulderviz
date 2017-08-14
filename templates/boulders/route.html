@@ -64,6 +64,8 @@ ul.routelist li a {
 
 <h2><span class="color_{{ route.color|add:1 }}">{{ route.get_color_display }}</span>: Route {{ route.number }}</h2>
 
+<p>ELO: {{ route.elo|floatformat:0 }}</p>
+
 <p>{% trans 'Climbers:' %}</p>
 
 <ol>

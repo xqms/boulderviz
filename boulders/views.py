@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from django.db.models import Count, Max
+from django.db.models import Count, Max, OuterRef, Exists
 
 from models import Climber, Route, Climb
 
@@ -56,6 +56,31 @@ def leaderboard(request, category=None):
 		'category': category,
 		'climbers': climbers,
 		'colors': [ c[1] for c in Route.COLOR_CHOICES ]
+	})
+
+def list_routes(request, color=None):
+	''' List all known routes '''
+
+	if color is None:
+		color = Route.PINK
+		if request.climber:
+			color = request.climber.minColor()
+		return redirect('list_routes', color=color)
+
+	color = int(color)
+
+	res = Route.objects.filter(color=color, climb__pk__gte=0).aggregate(Max('number'))
+
+	routes = Route.objects.filter(color=color, number__lte=res['number__max']).annotate(Count('climb'))
+
+	if request.climber:
+		climbed_by_me = Climb.objects.filter(route=OuterRef('pk'), climber=request.climber)
+		routes = routes.annotate(climbed_by_me=Exists(climbed_by_me))
+
+	return render(request, 'boulders/list_routes.html', {
+		'colors': Route.COLOR_CHOICES,
+		'color': color,
+		'routes': routes,
 	})
 
 def set_climber(request):
