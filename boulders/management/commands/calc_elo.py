@@ -80,8 +80,14 @@ class Command(BaseCommand):
 				# Otherwise, assume that the climber has failed.
 				above_category = route.color != Route.PINK and route.color > climber.maxColor()
 
-				if (not above_category) and ((route.color not in max_for_color) or (route.number > max_for_color[route.color] or route.number < min_for_color[route.color])):
-					continue # No match, climber has probably not tried this one yet.
+				if not above_category:
+					if route.color not in max_for_color:
+						# Climber hasn't climbed anything in that category, nothing to rate.
+						continue
+
+					if route.number > max_for_color[route.color] or route.number < min_for_color[route.color]:
+						# Outside of climbers' climb history => not attempted
+						continue
 
 				climbs = Climb.objects.filter(climber=climber, route=route)
 				if date:
