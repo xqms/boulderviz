@@ -71,6 +71,10 @@ class Command(BaseCommand):
 				max_for_color[color] = res['route__number__max']
 
 			for route in routes:
+				# Anything below your category does not count.
+				if route.color < climber.minColor():
+					continue
+
 				# If the route is in the climbers category or below, assume that the climber has only tried
 				# the routes up to his maximum entry in that color.
 				# Otherwise, assume that the climber has failed.
