@@ -53,7 +53,9 @@ class Command(BaseCommand):
 
 		matches = []
 
-		route_climbed = [ False for route in routes ]
+		# Keep track of whether we have a counted climb
+		for route in routes:
+			route.climbed = False
 
 		for climber in climbers:
 			# Aggregate minimum and maximum route numbers for each color that
@@ -73,7 +75,7 @@ class Command(BaseCommand):
 				min_for_color[color] = res['route__number__min']
 				max_for_color[color] = res['route__number__max']
 
-			for route_idx,route in enumerate(routes):
+			for route in routes:
 				# Anything below your category does not count.
 				if route.color < climber.minColor():
 					continue
@@ -99,12 +101,12 @@ class Command(BaseCommand):
 				climbed = route.color < climber.minColor() or climbs.exists()
 				matches.append((climber, route, climbed))
 
-				if climbed:
-					route_climbed[route_idx] = True
+				route.climbed = True
 
 		# Filter out routes which still did not get climbs
 		# Can happen if climbs are rejected by the logic above.
-		routes = [ route for idx,route in enumerate(routes) if route_climbed[idx] ]
+		routes = [ route for route in routes if route.climbed ]
+		matches = [ match for match in matches if match[1].climbed ]
 
 		return climbers, routes, matches
 
