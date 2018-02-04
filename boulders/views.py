@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from django.db.models import Count, Max, OuterRef, Exists
+from django.db.models import Count, Max, Min, OuterRef, Exists
 
 from models import Climber, Route, Climb
 
@@ -123,9 +123,9 @@ def advisor(request):
 	if request.climber:
 		colors = request.climber.allInterestingColors()
 
-	start_date = django.utils.timezone.now() - datetime.timedelta(20)
+	start_date = django.utils.timezone.now() - datetime.timedelta(30)
 
-	routes = Route.objects.filter(color__in=colors, climb__date__gte=start_date.date())
+	routes = Route.objects.filter(color__in=colors).annotate(Min('climb__date')).filter(climb__date__min__gte=start_date.date())
 
 	if request.climber:
 		routes = routes.exclude(climbers=request.climber)
@@ -153,6 +153,9 @@ def advisor(request):
 
 		for color, name in climber.allInterestingColorsWithNames():
 			max_num = Route.objects.filter(color=color).annotate(Count('climb')).filter(climb__count__gte=2).aggregate(Max('number'))['number__max']
+			if max_num is None:
+				max_num = 0
+
 			max_num += 10
 
 			max_num = int(math.ceil(max_num / float(columns)) * columns)

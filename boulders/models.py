@@ -33,7 +33,7 @@ class Route(models.Model):
 	)
 
 	COLOR_POINTS = {
-		ORANGE: 1,
+		ORANGE: 3,
 		YELLOW: 1,
 		GREEN:  2,
 		RED:    3,
@@ -68,7 +68,7 @@ class Route(models.Model):
 
 class Climber(models.Model):
 	CATEGORY_CHOICES = (
-		('A', _('Orange & yellow')),
+#		('A', _('Orange & yellow')),
 		('B', _('Green & red')),
 		('C', _('Red & blue')),
 		('D', _('Blue & gray')),
@@ -80,7 +80,7 @@ class Climber(models.Model):
 	)
 
 	MIN_COLOR_FOR_CATEGORY = {
-		'A': Route.ORANGE,
+#		'A': Route.ORANGE,
 		'B': Route.GREEN,
 		'C': Route.RED,
 		'D': Route.BLUE,
@@ -129,7 +129,7 @@ class Climber(models.Model):
 
 	def interestingColors(self):
 		""" Colors which contribute to the climbers score """
-		return [self.minColor(), self.minColor() + 1, Route.PINK]
+		return [self.minColor(), self.minColor() + 1, Route.PINK, Route.ORANGE]
 
 	def interestingColorsWithNames(self):
 		""" Colors which contribute to the climbers score """
@@ -137,7 +137,7 @@ class Climber(models.Model):
 
 	def allInterestingColors(self):
 		""" Colors which contribute to the climbers *score """
-		return range(self.minColor(), Route.PINK+1)
+		return range(self.minColor(), Route.PINK+1) + [Route.ORANGE]
 
 	def allInterestingColorsWithNames(self):
 		""" Colors which contribute to the climbers score """
