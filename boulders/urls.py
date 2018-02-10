@@ -5,7 +5,8 @@ import views
 
 urlpatterns = [
     url(r'^leaderboard/$', views.leaderboard),
-    url(r'^leaderboard/(?P<category>[A-E])/$', views.leaderboard, name='leaderboard'),
+    url(r'^leaderboard/(?P<category>[B-E])/$', views.leaderboard),
+    url(r'^leaderboard/(?P<category>[B-E])/(?P<gender>[mf])/$', views.leaderboard, name='leaderboard'),
     url(r'^set_climber/$', views.set_climber, name='set_climber'),
     url(r'^climber/(?P<climber_id>\d+)/$', views.view_climber, name='view_climber'),
     url(r'^list_routes/$', views.list_routes),

@@ -61,9 +61,18 @@
 <ul class="nav nav-pills">
 	{% for code, label in categories %}
 	<li role="presentation" class="{% if code == category %}active{% endif %}">
-		<a href="{% url 'leaderboard' category=code %}">{{ code }}<span class="{% if code != category %}hidden-xs{% endif %}">: {{ label }}</span></a>
+		<a href="{% url 'leaderboard' category=code gender=gender %}">{{ code }}<span class="{% if code != category %}hidden-xs{% endif %}">: {{ label }}</span></a>
 	</li>
 	{% endfor %}
+</ul>
+
+<ul class="nav nav-pills">
+	<li role="presentation" class="{% if gender == 'm' %}active{% endif %}">
+		<a href="{% url 'leaderboard' category=category gender='m' %}">Men</a>
+	</li>
+	<li role="presentation" class="{% if gender == 'f' %}active{% endif %}">
+		<a href="{% url 'leaderboard' category=category gender='f' %}">Women</a>
+	</li>
 </ul>
 
 <div class="table-responsive" style="margin-top: 3ex">

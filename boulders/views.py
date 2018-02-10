@@ -31,16 +31,24 @@ def middleware(get_response):
 	return m
 
 
-def leaderboard(request, category=None):
+def leaderboard(request, category=None, gender=None):
 	''' View current leaderboard '''
 
 	if category is None:
-		category = 'A'
+		category = 'B'
+		gender = 'f'
 		if request.climber:
 			category = request.climber.category
-		return redirect('leaderboard', category=category)
+			gender = request.climber.gender
+		return redirect('leaderboard', category=category, gender=gender)
 
-	climbers = Climber.objects.filter(category=category).order_by('-points', '-all_points')
+	if gender is None:
+		gender = 'f'
+		if request.climber:
+			gender = request.climber.gender
+		return redirect('leaderboard', category=category, gender=gender)
+
+	climbers = Climber.objects.filter(category=category, gender=gender).order_by('-points', '-all_points')
 
 	# Create ranking
 	place = 0
@@ -54,6 +62,7 @@ def leaderboard(request, category=None):
 	return render(request, 'boulders/leaderboard.html', {
 		'categories': Climber.CATEGORY_CHOICES,
 		'category': category,
+		'gender': gender,
 		'climbers': climbers,
 		'colors': [ c[1] for c in Route.COLOR_CHOICES ]
 	})
