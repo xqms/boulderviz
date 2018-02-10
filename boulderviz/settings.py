@@ -126,3 +126,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_serve')
 STATICFILES_DIRS = [
 	os.path.join(BASE_DIR, 'static')
 ]
+
+# Session configuration
+SESSION_COOKIE_AGE = 10713600 # 4 months
+
