@@ -130,14 +130,20 @@ def view_climber(request, climber_id):
 
 	for color, name in climber.allInterestingColorsWithNames():
 		coldata = [
-			[ [min_num + num, False, False, None] for num in range(r * columns, r * columns + columns) ]
+			[ [min_num + num, False, False, None, False] for num in range(r * columns, r * columns + columns) ]
 			for r in range(0, (max_num - min_num + 1) / columns)
 		]
 
-		climbs = climber.climb_set.filter(route__color=color, route__number__gte=min_num, route__number__lt=max_num)
+		climbs = climber.climb_set.filter(route__color=color, route__number__lt=max_num)
 		for climb in climbs:
 			idx = climb.route.number - min_num
 			coldata[idx / columns][idx % columns][1] = True
+
+		if request.climber:
+			climbs = request.climber.climb_set.filter(route__color=color, route__number__lt=max_num)
+			for climb in climbs:
+				idx = climb.route.number - min_num
+				coldata[idx / columns][idx % columns][4] = True
 
 		climbs = Climb.objects.filter(route__color=color, route__number__gte=min_num, route__number__lt=max_num)
 		for climb in climbs:
@@ -152,6 +158,7 @@ def view_climber(request, climber_id):
 		'climbs': climber.climb_set.order_by('-date', 'route__color', 'route__number'),
 		'routes': climber.routes.order_by('color', 'number'),
 		'boxes': boxes,
+		'is_climber': (request.climber is not None),
 		'colors': [ c[1] for c in Route.COLOR_CHOICES ],
 	})
 

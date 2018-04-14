@@ -64,11 +64,19 @@ ul.routelist li a {
 
 .checktable td {
 	border: 1px solid black;
-	padding: 6px;
-	width: 5ex;
 	text-align: center;
 	font-weight: bold;
 	font-size: 70%;
+}
+
+.checktable td .route_cell {
+	position: relative;
+}
+
+.checktable td .route_content {
+	display: block;
+	width: 5ex;
+	padding: 6px;
 }
 
 .checktable td.climbed {
@@ -79,6 +87,13 @@ ul.routelist li a {
 
 .checktable td.never_climbed {
 	font-weight: normal;
+}
+
+.checktable .climbed_symbol {
+	position: absolute;
+	top: auto;
+	bottom: 0px;
+	right: 0px;
 }
 
 @media(min-width:992px) {
@@ -200,13 +215,22 @@ ul.routelist li a {
 						<table class="checktable">
 							{% for row in coldata %}
 							<tr>
-								{% for number, climbed, all_climbed, route in row %}
-								<td class="{% if climbed %}color_{{ color|add:1 }}{% endif %} {% if not all_climbed %}never_climbed{% endif %}">
-									{% if route %}
-									<a href="{{ route.get_absolute_url }}">{{ number }}</a>
-									{% else %}
-									{{ number }}
-									{% endif %}
+								{% for number, climbed, all_climbed, route, self_climbed in row %}
+								<td class="
+									{% if climbed %}color_{{ color|add:1 }}{% endif %}
+									{% if not all_climbed %}never_climbed{% endif %}
+									">
+									<div class="route_cell">
+										{% if route %}
+										<a class="route_content" href="{{ route.get_absolute_url }}">{{ number }}</a>
+										{% if is_climber %}
+											{% if climbed and not self_climbed %}<div class="climbed_symbol glyphicon glyphicon-remove" />{% endif %}
+											{% if not climbed and self_climbed %}<div class="climbed_symbol glyphicon glyphicon-ok" />{% endif %}
+										{% endif %}
+										{% else %}
+										<div class="route_content">{{ number }}</div>
+										{% endif %}
+									</div>
 								</td>
 								{% endfor %}
 							</tr>
