@@ -58,6 +58,35 @@ ul.routelist li a {
 	background-color: #ffbaf9 !important;
 }
 
+.checktable {
+	table-layout: fixed;
+}
+
+.checktable td {
+	border: 1px solid black;
+	padding: 6px;
+	width: 5ex;
+	text-align: center;
+	font-weight: bold;
+	font-size: 70%;
+}
+
+.checktable td.climbed {
+/* 	text-decoration: line-through; */
+	background-color: #a0ffa0 !important;
+	font-weight: normal;
+}
+
+.checktable td.never_climbed {
+	font-weight: normal;
+}
+
+@media(min-width:992px) {
+	.checktable td {
+		font-size: 100%;
+	}
+}
+
 </style>
 <script type="text/javascript" src="{% static 'plotly/plotly.min.js' %}"></script>
 {% endblock %}
@@ -160,23 +189,35 @@ ul.routelist li a {
 	</div>
 
 	<div role="tabpanel" class="tab-pane" id="all_boulders">
-		{% regroup routes by color as color_routes %}
-		{% for color in color_routes %}
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">{{ color.list.0.get_color_display }} ({{ color.list|length }})</h3>
-				</div>
-				<div class="panel-body">
-					<ul class="routelist">
-						{% for route in color.list %}
-						<li class=""><a class="color_{{ route.color|add:1 }}" href="{{ route.get_absolute_url }}">{{ route.number }}</a></li>
-						{% endfor %}
-					</ul>
+		<div class="panel panel-default">
+			<div class="panel-heading">Climbed routes</div>
+
+			<div class="panel-body">
+				<div class="row">
+					{% for color, color_name, coldata in boxes %}
+					<div class="col-sm-6">
+						<h4>{{ color_name }} routes</h4>
+						<table class="checktable">
+							{% for row in coldata %}
+							<tr>
+								{% for number, climbed, all_climbed, route in row %}
+								<td class="{% if climbed %}color_{{ color|add:1 }}{% endif %} {% if not all_climbed %}never_climbed{% endif %}">
+									{% if route %}
+									<a href="{{ route.get_absolute_url }}">{{ number }}</a>
+									{% else %}
+									{{ number }}
+									{% endif %}
+								</td>
+								{% endfor %}
+							</tr>
+							{% endfor %}
+						</table>
+					</div>
+					{% endfor %}
 				</div>
 			</div>
-		{% endfor %}
+		</div>
 	</div>
 </div>
 
 {% endblock %}
-

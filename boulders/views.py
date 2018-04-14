@@ -112,10 +112,46 @@ def set_climber(request):
 def view_climber(request, climber_id):
 	climber = get_object_or_404(Climber, id=climber_id)
 
+	boxes = None
+
+	columns = 10
+	rows = 4
+
+	boxes = []
+
+	max_num = Route.objects.annotate(Count('climb')).filter(climb__count__gte=2).aggregate(Max('number'))['number__max']
+	if max_num is None:
+		max_num = 0
+
+	max_num += 10
+
+	max_num = int(math.ceil(max_num / float(columns)) * columns)
+	min_num = 1
+
+	for color, name in climber.allInterestingColorsWithNames():
+		coldata = [
+			[ [min_num + num, False, False, None] for num in range(r * columns, r * columns + columns) ]
+			for r in range(0, (max_num - min_num + 1) / columns)
+		]
+
+		climbs = climber.climb_set.filter(route__color=color, route__number__gte=min_num, route__number__lt=max_num)
+		for climb in climbs:
+			idx = climb.route.number - min_num
+			coldata[idx / columns][idx % columns][1] = True
+
+		climbs = Climb.objects.filter(route__color=color, route__number__gte=min_num, route__number__lt=max_num)
+		for climb in climbs:
+			idx = climb.route.number - min_num
+			coldata[idx / columns][idx % columns][2] = True
+			coldata[idx / columns][idx % columns][3] = climb.route
+
+		boxes.append((color, name, coldata))
+
 	return render(request, 'boulders/climber.html', {
 		'climber': climber,
 		'climbs': climber.climb_set.order_by('-date', 'route__color', 'route__number'),
 		'routes': climber.routes.order_by('color', 'number'),
+		'boxes': boxes,
 		'colors': [ c[1] for c in Route.COLOR_CHOICES ],
 	})
 
