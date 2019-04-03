@@ -55,7 +55,7 @@ class Command(BaseCommand):
 		leaderboard = session.get('http://climbercontest.de/bbl2017/contest.php')
 		soup = BeautifulSoup(leaderboard.text, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
-		regex = re.compile(r'Kategorie ([A-E])')
+		regex = re.compile(r'Kategorie ([A-C])')
 		climberRegex = re.compile(r'(.*) \[(m|w)\]')
 		for heading in soup.findAll('h1'):
 			match = re.match(regex, heading.text)

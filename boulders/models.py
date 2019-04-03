@@ -34,13 +34,12 @@ class Route(models.Model):
 
 	COLOR_POINTS = {
 		ORANGE: 3,
-		YELLOW: 1,
 		GREEN:  2,
 		RED:    3,
 		BLUE:   4,
 		GRAY:   5,
 		BLACK:  6,
-		PINK:   3,
+		PINK:   4,
 	}
 
 	color = models.PositiveSmallIntegerField(choices=COLOR_CHOICES)
@@ -68,11 +67,9 @@ class Route(models.Model):
 
 class Climber(models.Model):
 	CATEGORY_CHOICES = (
-#		('A', _('Orange & yellow')),
-		('B', _('Green & red')),
-		('C', _('Red & blue')),
-		('D', _('Blue & gray')),
-		('E', _('Gray & black')),
+		('A', _('Green & red')),
+		('B', _('Red & blue')),
+		('C', _('Blue & gray')),
 	)
 	GENDER_CHOICES = (
 		('m', 'Male'),
@@ -80,11 +77,9 @@ class Climber(models.Model):
 	)
 
 	MIN_COLOR_FOR_CATEGORY = {
-#		'A': Route.ORANGE,
-		'B': Route.GREEN,
-		'C': Route.RED,
-		'D': Route.BLUE,
-		'E': Route.GRAY,
+		'A': Route.GREEN,
+		'B': Route.RED,
+		'C': Route.BLUE,
 	}
 
 	name = models.CharField(max_length=255, verbose_name=_('Name'))
